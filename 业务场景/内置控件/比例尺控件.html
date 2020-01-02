@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <script src="../lib/ol/ol.js"></script>
+    <link href="../css/ol.css" rel="stylesheet" />
+    <style type="text/css">
+        #scalebar
+        {
+            float:left;
+            margin-bottom:10px;
+            z-index:2000;
+        }
+    </style>
+    <script type="text/javascript">
+        window.onload = function () {
+            //实例化比例尺控件
+            var scaleLineControl = new ol.control.ScaleLine({
+                //设置度量单位为米
+                units: 'metric',
+                target: 'scalebar',
+                className: 'ol-scale-line'
+            });
+            //实例化地图控件
+            var map = new ol.Map({
+                target: 'map',
+                layers: [
+                    new ol.layer.Tile({
+                        source:new ol.source.OSM()
+                    }),
+                ],
+                view: new ol.View({
+                    center: [0, 0],
+                    zoom:2
+                }),
+            });
+            //将比例尺控件加入到map中
+            map.addControl(scaleLineControl);
+        };
+    </script>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="scalebar"></div>
+</body>
+</html>
