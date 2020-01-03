@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Accessible Map</title>
+<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+<!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+<script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+<style>
+a.skiplink {
+position: absolute;
+clip: rect(1px, 1px, 1px, 1px);
+padding: 0;
+border: 0;
+height: 1px;
+width: 1px;
+overflow: hidden;
+}
+a.skiplink:focus {
+clip: auto;
+height: auto;
+width: auto;
+background-color: #fff;
+padding: 0.3em;
+}
+#map:focus {
+outline: #4A74A8 solid 0.15em;
+}
+#scalebar
+        {
+            float:left;
+            margin-bottom:10px;
+            z-index:2000;
+        }
+</style>
+</head>
+<body>
+<a class="skiplink" href="#map">Go to map</a>
+<div id="map" class="map" tabindex="0"></div>
+<div id="scalebar"></div>
+<button id="zoom-out">Zoom out</button>
+<button id="zoom-in">Zoom in</button>
+<script>
+window.onload = function () {
+            //实例化比例尺控件
+            var scaleLineControl = new ol.control.ScaleLine({
+                //设置度量单位为米
+                units: 'metric',
+                target: 'scalebar',
+                className: 'ol-scale-line'
+            });
+            //将比例尺控件加入到map中
+            map.addControl(scaleLineControl);
+        };
+var map = new ol.Map({
+layers: [//层。如果没有定义，将呈现没有图层的映射。
+new ol.layer.Tile({//对于提供预渲染、平铺图像的网格层源，这些网格是按特定分辨率的缩放级别组织的。
+source: new ol.source.OSM()//OpenStreetMap平铺服务器的层源。
+})
+],//这里的冒号作用：声明对象直接量的成员  
+target: 'map',//target：映射的容器，元素本身或元素的id
+controls: ol.control.defaults({//最初添加到地图中的控件。如果没有指定，那么将使用ol.control.defaults()。
+attributionOptions: {//属性选项
+collapsible: false//用于展开属性按钮的文本标签。默认是»。除了文本之外，还可以使用节点(如span元素)。
+}
+}),
+view: new ol.View({//初始界面的位置和初始缩放大小
+center: [0, 0],
+zoom: 3
+})
+});
+//缩小
+document.getElementById('zoom-out').onclick = function() {//document：获取DOM对象 getElementById：获取目标id onclick：点击事件
+var view = map.getView();//从map中得到视图
+var zoom = view.getZoom();//从视图中得到缩放的大小
+view.setZoom(zoom - 1);
+};
+//放大
+document.getElementById('zoom-in').onclick = function() {
+var view = map.getView();
+var zoom = view.getZoom();
+view.setZoom(zoom + 1);
+};
+</script>
+</body>
+</html>
