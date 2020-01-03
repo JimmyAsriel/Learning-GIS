@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <style>
+        /* 
+            在OpenLayers中，控制May控件的显示大小
+            用CSS来控制承载控件的Div大小
+        */
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+    <title>OpenLayers example</title>
+</head>
+
+<body>
+    <h2>My Map</h2>
+
+    <!-- 创建控件标签 -->
+    <div id="map" class="map"></div>
+
+    <script type="text/javascript">
+        // Map views always need a projection.  Here we just want to map image
+        // coordinates directly to map coordinates, so we create a projection that uses
+        // the image extent in pixels.
+        var extent = [0, 0, 1024, 968];//图片图层四至
+        var projection = new ol.proj.Projection({//定义坐标系
+            code: 'xkcd-image',
+            units: 'pixels',
+            extent: extent
+        });
+        var map = new ol.Map({
+            layers: [
+                new ol.layer.Image({
+                    source: new ol.source.ImageStatic({
+
+                        url: '../../Document/OLAPI.png',//地址
+                        projection: projection,
+                        imageExtent: extent
+                    })
+                })
+            ],
+            target: 'map',
+            view: new ol.View({
+                projection: projection,
+                center: ol.extent.getCenter(extent),
+                zoom: 2,
+                maxZoom: 8
+            })
+        });
+    </script>
+</body>
+
+</html>

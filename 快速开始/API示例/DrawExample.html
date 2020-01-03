@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<!-- 在底图上点线的绘制 -->
+<!-- API版本4.6.5 -->
+<head>
+    <title>Draw Features</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script
+        src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+</head>
+
+<body>
+
+    <!-- 控件容器 -->
+    <div id="map" class="map"></div>
+
+
+    <script>
+        //光栅，为Map提供OSM底图数据
+        var raster = new ol.layer.Tile({
+            //采用OSM数据源
+            source: new ol.source.OSM()
+        });
+
+        //
+        var source = new ol.source.Vector({ wrapX: false });
+        var vector = new ol.layer.Vector({
+            source: source
+        });
+
+        //初始化控件
+        var map = new ol.Map({
+            layers: [raster, vector],
+            target: 'map',
+            view: new ol.View({
+                center: [-11000000, 4600000],
+                zoom: 4
+            })
+        });
+
+
+        // global so we can remove it later
+        var draw; 
+        /*
+            interaction是实现交互类型的关键，一个全局配置对象
+        */
+        function addInteraction() {
+            //获取交互类型
+            var value = "Polygon";
+            if (value !== 'None') {
+                draw = new ol.interaction.Draw({
+                    source: source,
+                    //交互类型
+                    type: value
+                });
+                //绘制的功能依然采用面向对象的Map参数式的方法
+                map.addInteraction(draw);
+            }
+        }
+        addInteraction();
+    </script>
+</body>
+
+</html>
