@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>地震点聚集</title>
+    <link rel="stylesheet" href="./css/ol.css">
+    <script src="./js/ol.js"></script>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        // 初始化聚集要素的半径
+        // 可自由定义要素半径的计算规则
+        let maxFeatureCount;
+        let earthquakeCluster = null;
+        let calculateClusterInfo = (resolution) => {
+            maxFeatureCount = 0;
+            let features = earthquakeCluster.getSource().getFeatures();
+            let feature, radius;
+            for (let i = features.length - 1; i >= 0; i--) {
+                feature = features[i];
+                let originalFeatures = feature.get('features');
+                let extent = ol.extent.createEmpty();
+                let j = (void 0), jj = (void 0);
+                for (let j = 0, jj = originalFeatures.length; j < jj; ++j) {
+                    ol.extent.extend(extent, originalFeatures[j].getGeometry().getExtent());
+                }
+                maxFeatureCount = Math.max(maxFeatureCount, jj);
+                radius = 0.15 * (ol.extent.getWidth(extent) + ol.extent.getHeight(extent)) / resolution;
+                feature.set('radius', radius);
+            }
+        }
+        // 样式函数，对每个feature返回一个样式
+        let currentResolution;
+        let styleFunction = (feature, resolution) => {
+            if (resolution != currentResolution) {
+                calculateClusterInfo(resolution);
+                currentResolution = resolution;
+            }
+            let style;
+            let size = feature.get('features').length;
+            if (size > 1) {
+                style = new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: feature.get('radius'),
+                        fill: new ol.style.Fill({
+                            color: [255, 153, 0]
+                        })
+                    }),
+                    text: new ol.style.Text({
+                        text: size.toString(),
+                        fill: new ol.style.Fill({
+                            color: '#fff'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: 'rgba(0, 0, 0, 0.6)',
+                            width: 3
+                        })
+                    })
+                })
+            } else {
+                // 每个地震点的默认样式
+                style = new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 3,
+                        fill: new ol.style.Fill({
+                            color: 'rgb(255, 0, 0)'
+                        })
+                    })
+                });
+            }
+            return style;
+        }
+        // 聚类图层
+        earthquakeCluster = new ol.layer.Vector({
+            source: new ol.source.Cluster({
+                distance: 80,   // 聚类阈值，当两点间距离小于20，便聚类为一个点
+                source: new ol.source.Vector({
+                    format: new ol.format.GeoJSON(),
+                    url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson'
+                })
+            }),
+            style: styleFunction
+        });
+        let map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([118, 36]),
+                zoom: 2
+            })
+        });
+        map.addLayer(earthquakeCluster)
+    </script>
+</body>
+
+</html>

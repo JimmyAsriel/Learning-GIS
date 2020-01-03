@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Device Orientation</title>
+<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+<!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+<script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+<script src="https://cdn.rawgit.com/dorukeker/gyronorm.js/v2.0.6/dist/gyronorm.complete.min.js"></script>
+</head>
+<body>
+<div id="map" class="map"></div>
+<p>
+<div>α : <code id="alpha"></code></div>
+<div>β : <code id="beta"></code></div>
+<div>γ : <code id="gamma"></code></div>
+</p>
+<script>
+var projection = ol.proj.get('EPSG:3857');
+var view = new ol.View({
+center: [0, 0],
+projection: projection,
+extent: projection.getExtent(),
+zoom: 2
+});
+var map = new ol.Map({
+layers: [
+new ol.layer.Tile({
+source: new ol.source.OSM()
+})
+],
+target: 'map',
+controls: ol.control.defaults({
+attributionOptions: {
+collapsible: false
+}
+}),
+view: view
+});
+
+function el(id) {
+return document.getElementById(id);
+}
+
+
+var gn = new GyroNorm();
+
+gn.init().then(function() {
+gn.start(function(event) {
+var center = view.getCenter();
+var resolution = view.getResolution();
+var alpha = ol.math.toRadians(event.do.beta);
+var beta = ol.math.toRadians(event.do.beta);
+var gamma = ol.math.toRadians(event.do.gamma);
+
+el('alpha').innerText = alpha + ' [rad]';
+el('beta').innerText = beta + ' [rad]';
+el('gamma').innerText = gamma + ' [rad]';
+
+center[0] -= resolution * gamma * 25;
+center[1] += resolution * beta * 25;
+
+view.setCenter(view.constrainCenter(center));
+});
+});
+</script>
+</body>
+</html>

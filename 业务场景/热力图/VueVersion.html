@@ -1,0 +1,83 @@
+<template>
+    <div>
+        <div id="map"></div>
+    </div>
+</template>
+
+<script>
+    import Map from 'ol/Map.js'
+    import View from 'ol/View.js'
+    import KML from 'ol/format/KML.js'
+    import { Heatmap as HeatmapLayer } from 'ol/layer.js'
+    import VectorSource from 'ol/source/Vector.js'
+    import { transform } from 'ol/proj'
+    import GeoJSON from 'ol/format/GeoJSON'
+    export default {
+        name: 'heatmap',
+        data() {
+            return {
+                map: null,
+                center: [121.05212688446045, 30.600614547729492],
+                // 热力图假数据
+                heatData: {
+                    type: 'FeatureCollection',
+                    features: [
+                        { type: 'Point', 'coordinates': [104.40, 31.19], count: 100 },
+                        { type: 'Point', 'coordinates': [113.30, 30.60], count: 19 },
+                        { type: 'Point', 'coordinates': [123.30, 30.60], count: 419 },
+                        { type: 'Point', 'coordinates': [105.30, 30.60], count: 319 },
+                        { type: 'Point', 'coordinates': [106.30, 30.60], count: 719 },
+                        { type: 'Point', 'coordinates': [109.30, 31.60], count: 519 },
+                        { type: 'Point', 'coordinates': [109.30, 30.60], count: 319 },
+                        { type: 'Point', 'coordinates': [108.30, 32.60], count: 139 },
+                        { type: 'Point', 'coordinates': [118.30, 31.60], count: 129 },
+                        { type: 'Point', 'coordinates': [108.30, 33.60], count: 190 },
+                        { type: 'Point', 'coordinates': [108.30, 32.60], count: 189 },
+                        { type: 'Point', 'coordinates': [100.30, 30.60], count: 1 },
+                        { type: 'Point', 'coordinates': [109.30, 30.60], count: 119 },
+                        { type: 'Point', 'coordinates': [108.30, 31.60], count: 200 },
+                        { type: 'Point', 'coordinates': [118.30, 30.60], count: 300 }
+                    ]
+                }
+            }
+        },
+        methods: {
+            initMap() {
+                // 创建一个热力图层
+                let vector = new HeatmapLayer({
+                    // 矢量数据源
+                    source: new VectorSource({
+                        features: (new GeoJSON()).readFeatures(this.heatData, {
+                            dataProjection: 'EPSG:4326',
+                            featureProjection: 'EPSG:3857'
+                        }),
+                    }),
+                    blur: 20, // 模糊尺寸
+                    radius: 20 // 热点半径
+                })
+
+                this.map = new Map({
+                    target: 'map',
+                    // 在layers中添加自己所需要的图层，这里不做添加，只添加热力图层
+                    layers: [
+                        vector
+                    ],
+                    view: new View({
+                        // 地图初始中心位置
+                        center: transform(this.center, 'EPSG:4326', 'EPSG:3857'),
+                        zoom: 5
+                    })
+                })
+            }
+        },
+        mounted() {
+            this.initMap()
+        }
+    }
+</script>
+
+<style scoped>
+    .label {
+        font-size: 20px;
+    }
+</style>
