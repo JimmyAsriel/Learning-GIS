@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WMS GetFeatureInfo (Layers)</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <table id="info">
+      <tr>
+        <td>All features:</td>
+        <td id="all"></td>
+      </tr>
+      <tr>
+        <td>Hotel features:</td>
+        <td id="hotel"></td>
+      </tr>
+      <tr>
+        <td>Restaurant features:</td>
+        <td id="restaurant"></td>
+      </tr>
+    </table>
+    <script >import 'ol/ol.css';
+import WMSGetFeatureInfo from 'ol/format/WMSGetFeatureInfo';
+
+fetch('data/wmsgetfeatureinfo/osm-restaurant-hotel.xml').then(function(response) {
+  return response.text();
+}).then(function(response) {
+
+  // this is the standard way to read the features
+  var allFeatures = new WMSGetFeatureInfo().readFeatures(response);
+  document.getElementById('all').innerText = allFeatures.length.toString();
+
+  // when specifying the 'layers' options, only the features of those
+  // layers are returned by the format
+  var hotelFeatures = new WMSGetFeatureInfo({
+    layers: ['hotel']
+  }).readFeatures(response);
+  document.getElementById('hotel').innerText = hotelFeatures.length.toString();
+
+  var restaurantFeatures = new WMSGetFeatureInfo({
+    layers: ['restaurant']
+  }).readFeatures(response);
+  document.getElementById('restaurant').innerText = restaurantFeatures.length.toString();
+
+});</script>
+  </body>
+</html>

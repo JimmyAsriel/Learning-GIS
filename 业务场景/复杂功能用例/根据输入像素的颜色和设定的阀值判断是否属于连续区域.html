@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Region Growing</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+      table.controls td {
+        min-width: 110px;
+        padding: 2px 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map" style="cursor: pointer"></div>
+    <table class="controls">
+      <tr>
+        <td>Threshold: <span id="threshold-value"></span></td>
+        <td><input id="threshold" type="range" min="1" max="50" value="20"></td>
+      </tr>
+    </table>
+    <script >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import {Image as ImageLayer, Tile as TileLayer} from 'ol/layer';
+        import {fromLonLat} from 'ol/proj';
+        import BingMaps from 'ol/source/BingMaps';
+        import RasterSource from 'ol/source/Raster';
+        
+        function growRegion(inputs, data) {
+          var image = inputs[0];
+          var seed = data.pixel;
+          var delta = parseInt(data.delta);
+          if (!seed) {
+            return image;
+          }
+        
+          seed = seed.map(Math.round);
+          var width = image.width;
+          var height = image.height;
+          var inputData = image.data;
+          var outputData = new Uint8ClampedArray(inputData);
+          var seedIdx = (seed[1] * width + seed[0]) * 4;
+          var seedR = inputData[seedIdx];
+          var seedG = inputData[seedIdx + 1];
+          var seedB = inputData[seedIdx + 2];
+          var edge = [seed];
+          while (edge.length) {
+            var newedge = [];
+            for (var i = 0, ii = edge.length; i < ii; i++) {
+              // As noted in the Raster source constructor, this function is provided
+              // using the `lib` option. Other functions will NOT be visible unless
+              // provided using the `lib` option.
+              var next = next4Edges(edge[i]);
+              for (var j = 0, jj = next.length; j < jj; j++) {
+                var s = next[j][0];
+                var t = next[j][1];
+                if (s >= 0 && s < width && t >= 0 && t < height) {
+                  var ci = (t * width + s) * 4;
+                  var cr = inputData[ci];
+                  var cg = inputData[ci + 1];
+                  var cb = inputData[ci + 2];
+                  var ca = inputData[ci + 3];
+                  // if alpha is zero, carry on
+                  if (ca === 0) {
+                    continue;
+                  }
+                  if (Math.abs(seedR - cr) < delta && Math.abs(seedG - cg) < delta &&
+                      Math.abs(seedB - cb) < delta) {
+                    outputData[ci] = 255;
+                    outputData[ci + 1] = 0;
+                    outputData[ci + 2] = 0;
+                    outputData[ci + 3] = 255;
+                    newedge.push([s, t]);
+                  }
+                  // mark as visited
+                  inputData[ci + 3] = 0;
+                }
+              }
+            }
+            edge = newedge;
+          }
+          return {data: outputData, width: width, height: height};
+        }
+        
+        function next4Edges(edge) {
+          var x = edge[0];
+          var y = edge[1];
+          return [
+            [x + 1, y],
+            [x - 1, y],
+            [x, y + 1],
+            [x, y - 1]
+          ];
+        }
+        
+        var key = 'Your Bing Maps Key from http://www.bingmapsportal.com/ here';
+        
+        var imagery = new TileLayer({
+          source: new BingMaps({key: key, imagerySet: 'Aerial'})
+        });
+        
+        var raster = new RasterSource({
+          sources: [imagery.getSource()],
+          operationType: 'image',
+          operation: growRegion,
+          // Functions in the `lib` object will be available to the operation run in
+          // the web worker.
+          lib: {
+            next4Edges: next4Edges
+          }
+        });
+        
+        var rasterImage = new ImageLayer({
+          opacity: 0.7,
+          source: raster
+        });
+        
+        var map = new Map({
+          layers: [imagery, rasterImage],
+          target: 'map',
+          view: new View({
+            center: fromLonLat([-119.07, 47.65]),
+            zoom: 11
+          })
+        });
+        
+        var coordinate;
+        
+        map.on('click', function(event) {
+          coordinate = event.coordinate;
+          raster.changed();
+        });
+        
+        var thresholdControl = document.getElementById('threshold');
+        
+        raster.on('beforeoperations', function(event) {
+          // the event.data object will be passed to operations
+          var data = event.data;
+          data.delta = thresholdControl.value;
+          if (coordinate) {
+            data.pixel = map.getPixelFromCoordinate(coordinate);
+          }
+        });
+        
+        function updateControlValue() {
+          document.getElementById('threshold-value').innerText = thresholdControl.value;
+        }
+        updateControlValue();
+        
+        thresholdControl.addEventListener('input', function() {
+          updateControlValue();
+          raster.changed();
+        });</script>
+  </body>
+</html>

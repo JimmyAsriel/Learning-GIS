@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Custom Overview Map</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+      .mapcontainer {
+        position: relative;
+      }
+
+      div.ol-custom-overviewmap,
+      div.ol-custom-overviewmap.ol-uncollapsible {
+        bottom: auto;
+        left: auto;
+        right: 0;
+        top: 0;
+      }
+
+      div.ol-custom-overviewmap:not(.ol-collapsed)  {
+        border: 1px solid black;
+      }
+
+      div.ol-custom-overviewmap div.ol-overviewmap-map {
+        border: none;
+        width: 300px;
+      }
+
+      div.ol-custom-overviewmap div.ol-overviewmap-box {
+        border: 2px solid red;
+      }
+
+      div.ol-custom-overviewmap:not(.ol-collapsed) button{
+        bottom: auto;
+        left: auto;
+        right: 1px;
+        top: 1px;
+      }
+
+      div.ol-rotate {
+        top: 170px;
+        right: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mapcontainer">
+      <div id="map" class="map"></div>
+    </div>
+    <div><input type="checkbox" id="rotateWithView">Rotate with view</div>
+    <script >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import {defaults as defaultControls, OverviewMap} from 'ol/control';
+        import {defaults as defaultInteractions, DragRotateAndZoom} from 'ol/interaction';
+        import TileLayer from 'ol/layer/Tile';
+        import OSM from 'ol/source/OSM';
+        
+        
+        var rotateWithView = document.getElementById('rotateWithView');
+        
+        var overviewMapControl = new OverviewMap({
+          // see in overviewmap-custom.html to see the custom CSS used
+          className: 'ol-overviewmap ol-custom-overviewmap',
+          layers: [
+            new TileLayer({
+              source: new OSM({
+                'url': 'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png' +
+                    '?apikey=Your API key from http://www.thunderforest.com/docs/apikeys/ here'
+              })
+            })
+          ],
+          collapseLabel: '\u00BB',
+          label: '\u00AB',
+          collapsed: false
+        });
+        
+        rotateWithView.addEventListener('change', function() {
+          overviewMapControl.setRotateWithView(this.checked);
+        });
+        
+        var map = new Map({
+          controls: defaultControls().extend([
+            overviewMapControl
+          ]),
+          interactions: defaultInteractions().extend([
+            new DragRotateAndZoom()
+          ]),
+          layers: [
+            new TileLayer({
+              source: new OSM()
+            })
+          ],
+          target: 'map',
+          view: new View({
+            center: [500000, 6000000],
+            zoom: 7
+          })
+        });</script>
+  </body>
+</html>

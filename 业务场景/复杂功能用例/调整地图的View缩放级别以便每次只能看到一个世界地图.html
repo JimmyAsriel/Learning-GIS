@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>View Min-Zoom</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script  >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import TileLayer from 'ol/layer/Tile';
+        import OSM from 'ol/source/OSM';
+        
+        var viewport = document.getElementById('map');
+        
+        function getMinZoom() {
+          var width = viewport.clientWidth;
+          return Math.ceil(Math.LOG2E * Math.log(width / 256));
+        }
+        
+        var initialZoom = getMinZoom();
+        
+        var view = new View({
+          center: [0, 0],
+          minZoom: initialZoom,
+          zoom: initialZoom
+        });
+        
+        var map = new Map({
+          layers: [
+            new TileLayer({
+              source: new OSM()
+            })
+          ],
+          target: 'map',
+          view: view
+        });
+        
+        window.addEventListener('resize', function() {
+          var minZoom = getMinZoom();
+          if (minZoom !== view.getMinZoom()) {
+            view.setMinZoom(minZoom);
+          }
+        });</script>
+  </body>
+</html>
