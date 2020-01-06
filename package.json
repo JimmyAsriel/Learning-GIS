@@ -4,7 +4,7 @@
   "description": "some example to learing GIS , inclued Openlayers example and other background",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
   },
   "repository": {
     "type": "git",
@@ -19,4 +19,5 @@
   "dependencies": {
     "ol": "^6.1.1"
   }
+  
 }

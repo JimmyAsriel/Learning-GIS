@@ -3,11 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>地震点聚集</title>
-    <link rel="stylesheet" href="./css/ol.css">
-    <script src="./js/ol.js"></script>
+
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css"
+        type="text/css">
 </head>
 
 <body>
@@ -34,6 +37,7 @@
                 feature.set('radius', radius);
             }
         }
+        
         // 样式函数，对每个feature返回一个样式
         let currentResolution;
         let styleFunction = (feature, resolution) => {
