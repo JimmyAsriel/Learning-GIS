@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>EPSG:4326</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script >
+    import 'ol/ol.css';
+import Map from 'ol/Map';
+import View from 'ol/View';
+import {defaults as defaultControls, ScaleLine} from 'ol/control';
+import TileLayer from 'ol/layer/Tile';
+import TileWMS from 'ol/source/TileWMS';
+
+
+var layers = [
+  new TileLayer({
+    source: new TileWMS({
+      url: 'https://ahocevar.com/geoserver/wms',
+      params: {
+        'LAYERS': 'ne:NE1_HR_LC_SR_W_DR',
+        'TILED': true
+      }
+    })
+  })
+];
+
+var map = new Map({
+  controls: defaultControls().extend([
+    new ScaleLine({
+      units: 'degrees'
+    })
+  ]),
+  layers: layers,
+  target: 'map',
+  view: new View({
+    projection: 'EPSG:4326',
+    center: [0, 0],
+    zoom: 2
+  })
+});</script>
+  </body>
+</html>

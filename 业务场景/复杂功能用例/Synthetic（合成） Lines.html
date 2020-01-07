@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Synthetic Lines</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script >import 'ol/ol.css';
+        import Feature from 'ol/Feature';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import LineString from 'ol/geom/LineString';
+        import VectorLayer from 'ol/layer/Vector';
+        import VectorSource from 'ol/source/Vector';
+        import {Stroke, Style} from 'ol/style';
+        
+        
+        var count = 10000;
+        var features = new Array(count);
+        
+        var startPoint = [0, 0];
+        var endPoint;
+        
+        var delta, deltaX, deltaY;
+        var signX = 1;
+        var signY = -1;
+        
+        // Create a square spiral.
+        var i;
+        for (i = 0; i < count; ++i) {
+          delta = (i + 1) * 2500;
+          if (i % 2 === 0) {
+            signY *= -1;
+          } else {
+            signX *= -1;
+          }
+          deltaX = delta * signX;
+          deltaY = delta * signY;
+          endPoint = [startPoint[0] + deltaX, startPoint[1] + deltaY];
+          features[i] = new Feature({
+            'geometry': new LineString([startPoint, endPoint])
+          });
+          startPoint = endPoint;
+        }
+        
+        var vector = new VectorLayer({
+          source: new VectorSource({
+            features: features,
+            wrapX: false
+          }),
+          style: new Style({
+            stroke: new Stroke({
+              color: '#666666',
+              width: 1
+            })
+          })
+        });
+        
+        var view = new View({
+          center: [0, 0],
+          zoom: 0
+        });
+        
+        var map = new Map({
+          layers: [vector],
+          target: 'map',
+          view: view
+        });</script>
+  </body>
+</html>

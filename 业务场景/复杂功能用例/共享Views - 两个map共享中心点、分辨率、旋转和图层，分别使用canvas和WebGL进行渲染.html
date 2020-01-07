@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Shared Views</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+      @media (min-width: 800px) {
+        .wrapper {
+          display: flex;
+        }
+        .half {
+          padding: 0 10px;
+          width: 50%;
+          float: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="half">
+        <h4>Road</h4>
+        <div id="roadMap" class="map"></div>
+      </div>
+      <div class="half">
+        <h4>Aerial</h4>
+        <div id="aerialMap" class="map"></div>
+      </div>
+    </div>
+    <script >
+    import 'ol/ol.css';
+import Map from 'ol/Map';
+import View from 'ol/View';
+import TileLayer from 'ol/layer/Tile';
+import BingMaps from 'ol/source/BingMaps';
+
+var roadLayer = new TileLayer({
+  source: new BingMaps({
+    key: 'Your Bing Maps Key from http://www.bingmapsportal.com/ here',
+    imagerySet: 'RoadOnDemand',
+    maxZoom: 19
+  })
+});
+
+var aerialLayer = new TileLayer({
+  source: new BingMaps({
+    key: 'Your Bing Maps Key from http://www.bingmapsportal.com/ here',
+    imagerySet: 'Aerial',
+    maxZoom: 19
+  })
+});
+
+var view = new View({
+  center: [-6655.5402445057125, 6709968.258934638],
+  zoom: 13
+});
+
+var map1 = new Map({
+  target: 'roadMap',
+  layers: [roadLayer],
+  view: view
+});
+
+var map2 = new Map({
+  target: 'aerialMap',
+  layers: [aerialLayer],
+  view: view
+});</script>
+  </body>
+</html>

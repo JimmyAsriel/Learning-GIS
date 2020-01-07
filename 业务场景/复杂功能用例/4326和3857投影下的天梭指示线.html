@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Tissot Indicatrix</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <h4>EPSG:4326</h4>
+    <div id="map4326" class="map"></div>
+    <h4>EPSG:3857</h4>
+    <div id="map3857" class="map"></div>
+    <script  >import 'ol/ol.css';
+        import Feature from 'ol/Feature';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import {circular as circularPolygon} from 'ol/geom/Polygon';
+        import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer';
+        import TileWMS from 'ol/source/TileWMS';
+        import VectorSource from 'ol/source/Vector';
+        
+        var vectorLayer4326 = new VectorLayer({
+          source: new VectorSource()
+        });
+        
+        var vectorLayer3857 = new VectorLayer({
+          source: new VectorSource()
+        });
+        
+        var map4326 = new Map({
+          layers: [
+            new TileLayer({
+              source: new TileWMS({
+                url: 'https://ahocevar.com/geoserver/wms',
+                params: {
+                  'LAYERS': 'ne:NE1_HR_LC_SR_W_DR',
+                  'TILED': true
+                }
+              })
+            }),
+            vectorLayer4326
+          ],
+          target: 'map4326',
+          view: new View({
+            projection: 'EPSG:4326',
+            center: [0, 0],
+            zoom: 2
+          })
+        });
+        
+        var map3857 = new Map({
+          layers: [
+            new TileLayer({
+              source: new TileWMS({
+                url: 'https://ahocevar.com/geoserver/wms',
+                params: {
+                  'LAYERS': 'ne:NE1_HR_LC_SR_W_DR',
+                  'TILED': true
+                }
+              })
+            }),
+            vectorLayer3857
+          ],
+          target: 'map3857',
+          view: new View({
+            center: [0, 0],
+            zoom: 2
+          })
+        });
+        
+        var radius = 800000;
+        var x, y;
+        for (x = -180; x < 180; x += 30) {
+          for (y = -90; y < 90; y += 30) {
+            var circle4326 = circularPolygon([x, y], radius, 64);
+            var circle3857 = circle4326.clone().transform('EPSG:4326', 'EPSG:3857');
+            vectorLayer4326.getSource().addFeature(new Feature(circle4326));
+            vectorLayer3857.getSource().addFeature(new Feature(circle3857));
+          }
+        }</script>
+  </body>
+</html>

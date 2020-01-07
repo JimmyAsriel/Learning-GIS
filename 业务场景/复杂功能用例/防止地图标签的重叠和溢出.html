@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Vector Label Decluttering</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=Set""></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import GeoJSON from 'ol/format/GeoJSON';
+        import VectorLayer from 'ol/layer/Vector';
+        import VectorSource from 'ol/source/Vector';
+        import {Fill, Stroke, Style, Text} from 'ol/style';
+        
+        var map = new Map({
+          target: 'map',
+          view: new View({
+            center: [0, 0],
+            zoom: 1
+          })
+        });
+        
+        var labelStyle = new Style({
+          text: new Text({
+            font: '12px Calibri,sans-serif',
+            overflow: true,
+            fill: new Fill({
+              color: '#000'
+            }),
+            stroke: new Stroke({
+              color: '#fff',
+              width: 3
+            })
+          })
+        });
+        var countryStyle = new Style({
+          fill: new Fill({
+            color: 'rgba(255, 255, 255, 0.6)'
+          }),
+          stroke: new Stroke({
+            color: '#319FD3',
+            width: 1
+          })
+        });
+        var style = [countryStyle, labelStyle];
+        
+        var vectorLayer = new VectorLayer({
+          source: new VectorSource({
+            url: 'data/geojson/countries.geojson',
+            format: new GeoJSON()
+          }),
+          style: function(feature) {
+            labelStyle.getText().setText(feature.get('name'));
+            return style;
+          },
+          declutter: true
+        });
+        
+        map.addLayer(vectorLayer);</script>
+  </body>
+</html>

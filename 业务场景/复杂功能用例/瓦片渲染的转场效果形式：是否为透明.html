@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Tile Transitions</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <label>
+      render with an opacity transition
+      <input id="transition" type="checkbox" checked>
+    </label>
+    <script  >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import TileLayer from 'ol/layer/Tile';
+        import XYZ from 'ol/source/XYZ';
+        
+        var key = 'pk.eyJ1IjoidHNjaGF1YiIsImEiOiJjaW5zYW5lNHkxMTNmdWttM3JyOHZtMmNtIn0.CDIBD8H-G2Gf-cPkIuWtRg';
+        var url = 'https://{a-c}.tiles.mapbox.com/v4/mapbox.world-bright/{z}/{x}/{y}.png?access_token=' + key;
+        
+        var withTransition = new TileLayer({
+          source: new XYZ({url: url})
+        });
+        
+        var withoutTransition = new TileLayer({
+          source: new XYZ({url: url, transition: 0}),
+          visible: false
+        });
+        
+        var map = new Map({
+          layers: [withTransition, withoutTransition],
+          target: 'map',
+          view: new View({
+            center: [0, 0],
+            zoom: 2,
+            maxZoom: 11
+          })
+        });
+        
+        document.getElementById('transition').addEventListener('change', function(event) {
+          var transition = event.target.checked;
+          withTransition.setVisible(transition);
+          withoutTransition.setVisible(!transition);
+        });</script>
+  </body>
+</html>

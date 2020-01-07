@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Layer Groups</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+      #layertree li > span {
+        cursor: pointer;
+      }    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <div id="layertree">
+      <h5>Click on layer nodes below to change their properties.</h5>
+      <ul>
+        <li><span>OSM layer</span>
+          <fieldset id="layer0">
+            <label class="checkbox" for="visible0">
+              <input id="visible0" class="visible" type="checkbox"/>visibility
+            </label>
+            <label>opacity</label>
+            <input class="opacity" type="range" min="0" max="1" step="0.01"/>
+          </fieldset>
+        </li>
+        <li><span>Layer group</span>
+          <fieldset id="layer1">
+            <label class="checkbox" for="visible1">
+              <input id="visible1" class="visible" type="checkbox"/>visibility
+            </label>
+            <label>opacity</label>
+            <input class="opacity" type="range" min="0" max="1" step="0.01"/>
+          </fieldset>
+          <ul>
+            <li><span>Food insecurity layer</span>
+              <fieldset id="layer10">
+                <label class="checkbox" for="visible10">
+                  <input id="visible10" class="visible" type="checkbox"/>visibility
+                </label>
+                <label>opacity</label>
+                <input class="opacity" type="range" min="0" max="1" step="0.01"/>
+              </fieldset>
+            </li>
+            <li><span>World borders layer</span>
+              <fieldset id="layer11">
+                <label class="checkbox" for="visible11">
+                  <input id="visible11" class="visible" type="checkbox"/>visibility
+                </label>
+                <label>opacity</label>
+                <input class="opacity" type="range" min="0" max="1" step="0.01"/>
+              </fieldset>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <script >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import {Group as LayerGroup, Tile as TileLayer} from 'ol/layer';
+        import {fromLonLat} from 'ol/proj';
+        import OSM from 'ol/source/OSM';
+        import TileJSON from 'ol/source/TileJSON';
+        
+        var key = 'Your Mapbox access token from https://mapbox.com/ here';
+        
+        var map = new Map({
+          layers: [
+            new TileLayer({
+              source: new OSM()
+            }), new LayerGroup({
+              layers: [
+                new TileLayer({
+                  source: new TileJSON({
+                    url: 'https://api.tiles.mapbox.com/v4/mapbox.20110804-hoa-foodinsecurity-3month.json?secure&access_token=' + key,
+                    crossOrigin: 'anonymous'
+                  })
+                }),
+                new TileLayer({
+                  source: new TileJSON({
+                    url: 'https://api.tiles.mapbox.com/v4/mapbox.world-borders-light.json?secure&access_token=' + key,
+                    crossOrigin: 'anonymous'
+                  })
+                })
+              ]
+            })
+          ],
+          target: 'map',
+          view: new View({
+            center: fromLonLat([37.40570, 8.81566]),
+            zoom: 4
+          })
+        });
+        
+        function bindInputs(layerid, layer) {
+          var visibilityInput = $(layerid + ' input.visible');
+          visibilityInput.on('change', function() {
+            layer.setVisible(this.checked);
+          });
+          visibilityInput.prop('checked', layer.getVisible());
+        
+          var opacityInput = $(layerid + ' input.opacity');
+          opacityInput.on('input change', function() {
+            layer.setOpacity(parseFloat(this.value));
+          });
+          opacityInput.val(String(layer.getOpacity()));
+        }
+        map.getLayers().forEach(function(layer, i) {
+          bindInputs('#layer' + i, layer);
+          if (layer instanceof LayerGroup) {
+            layer.getLayers().forEach(function(sublayer, j) {
+              bindInputs('#layer' + i + j, sublayer);
+            });
+          }
+        });
+        
+        $('#layertree li > span').click(function() {
+          $(this).siblings('fieldset').toggle();
+        }).siblings('fieldset').hide();</script>
+  </body>
+</html>

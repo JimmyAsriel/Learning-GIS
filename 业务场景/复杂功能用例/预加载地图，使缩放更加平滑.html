@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Preload Tiles</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map1" class="map"></div>
+    <div id="map2" class="map"></div>
+    <script >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import TileLayer from 'ol/layer/Tile';
+        import BingMaps from 'ol/source/BingMaps';
+        
+        
+        var view = new View({
+          center: [-4808600, -2620936],
+          zoom: 8
+        });
+        
+        var map1 = new Map({
+          layers: [
+            new TileLayer({
+              preload: Infinity,
+              source: new BingMaps({
+                key: 'Your Bing Maps Key from http://www.bingmapsportal.com/ here',
+                imagerySet: 'Aerial'
+              })
+            })
+          ],
+          target: 'map1',
+          view: view
+        });
+        
+        var map2 = new Map({
+          layers: [
+            new TileLayer({
+              preload: 0, // default value
+              source: new BingMaps({
+                key: 'Your Bing Maps Key from http://www.bingmapsportal.com/ here',
+                imagerySet: 'AerialWithLabelsOnDemand'
+              })
+            })
+          ],
+          target: 'map2',
+          view: view
+        });</script>
+  </body>
+</html>
