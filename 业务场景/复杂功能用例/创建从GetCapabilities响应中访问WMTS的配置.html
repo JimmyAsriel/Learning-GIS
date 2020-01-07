@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WMTS Layer from Capabilities</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import WMTSCapabilities from 'ol/format/WMTSCapabilities';
+        import TileLayer from 'ol/layer/Tile';
+        import OSM from 'ol/source/OSM';
+        import WMTS, {optionsFromCapabilities} from 'ol/source/WMTS';
+        
+        var parser = new WMTSCapabilities();
+        var map;
+        
+        fetch('data/WMTSCapabilities.xml').then(function(response) {
+          return response.text();
+        }).then(function(text) {
+          var result = parser.read(text);
+          var options = optionsFromCapabilities(result, {
+            layer: 'layer-7328',
+            matrixSet: 'EPSG:3857'
+          });
+        
+          map = new Map({
+            layers: [
+              new TileLayer({
+                source: new OSM(),
+                opacity: 0.7
+              }),
+              new TileLayer({
+                opacity: 1,
+                source: new WMTS(options)
+              })
+            ],
+            target: 'map',
+            view: new View({
+              center: [19412406.33, -5050500.21],
+              zoom: 5
+            })
+          });
+        });</script>
+  </body>
+</html>

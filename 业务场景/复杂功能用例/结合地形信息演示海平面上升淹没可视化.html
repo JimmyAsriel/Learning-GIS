@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Sea Level</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+      #level {
+        display: inline-block;
+        width: 150px;
+        vertical-align: text-bottom;
+      }
+
+      a.location {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <label>
+      Sea level
+      <input id="level" type="range" min="0" max="100" value="1"/>
+      +<span id="output"></span> m
+    </label>
+    <br>
+    Go to
+    <a class="location" data-center="-122.3267,37.8377" data-zoom="11">San Francisco</a>,
+    <a class="location" data-center="-73.9338,40.6861" data-zoom="11">New York</a>,
+    <a class="location" data-center="72.9481,18.9929" data-zoom="11">Mumbai</a>, or
+    <a class="location" data-center="120.831,31.160" data-zoom="9">Shanghai</a>
+    <script >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import {Image as ImageLayer, Tile as TileLayer} from 'ol/layer';
+        import {fromLonLat} from 'ol/proj';
+        import {Raster as RasterSource, TileJSON} from 'ol/source';
+        import XYZ from 'ol/source/XYZ';
+        
+        function flood(pixels, data) {
+          var pixel = pixels[0];
+          if (pixel[3]) {
+            var height = -10000 + ((pixel[0] * 256 * 256 + pixel[1] * 256 + pixel[2]) * 0.1);
+            if (height <= data.level) {
+              pixel[0] = 145;
+              pixel[1] = 175;
+              pixel[2] = 186;
+              pixel[3] = 255;
+            } else {
+              pixel[3] = 0;
+            }
+          }
+          return pixel;
+        }
+        
+        var key = 'Your Mapbox access token from https://mapbox.com/ here';
+        var elevation = new XYZ({
+          url: 'https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}.pngraw?access_token=' + key,
+          crossOrigin: 'anonymous'
+        });
+        
+        var raster = new RasterSource({
+          sources: [elevation],
+          operation: flood
+        });
+        
+        var map = new Map({
+          target: 'map',
+          layers: [
+            new TileLayer({
+              source: new TileJSON({
+                url: 'https://api.tiles.mapbox.com/v4/mapbox.world-light.json?secure&access_token=' + key,
+                crossOrigin: 'anonymous'
+              })
+            }),
+            new ImageLayer({
+              opacity: 0.6,
+              source: raster
+            })
+          ],
+          view: new View({
+            center: fromLonLat([-122.3267, 37.8377]),
+            zoom: 11
+          })
+        });
+        
+        var control = document.getElementById('level');
+        var output = document.getElementById('output');
+        control.addEventListener('input', function() {
+          output.innerText = control.value;
+          raster.changed();
+        });
+        output.innerText = control.value;
+        
+        raster.on('beforeoperations', function(event) {
+          event.data.level = control.value;
+        });
+        
+        var locations = document.getElementsByClassName('location');
+        for (var i = 0, ii = locations.length; i < ii; ++i) {
+          locations[i].addEventListener('click', relocate);
+        }
+        
+        function relocate(event) {
+          var data = event.target.dataset;
+          var view = map.getView();
+          view.setCenter(fromLonLat(data.center.split(',').map(Number)));
+          view.setZoom(Number(data.zoom));
+        }</script>
+  </body>
+</html>

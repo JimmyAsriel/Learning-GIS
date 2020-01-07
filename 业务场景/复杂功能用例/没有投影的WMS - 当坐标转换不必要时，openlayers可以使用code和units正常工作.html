@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WMS without Projection</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import {Image as ImageLayer, Tile as TileLayer} from 'ol/layer';
+        import Projection from 'ol/proj/Projection';
+        import ImageWMS from 'ol/source/ImageWMS';
+        import TileWMS from 'ol/source/TileWMS';
+        
+        
+        var layers = [
+          new TileLayer({
+            source: new TileWMS({
+              attributions: '© <a href="http://www.geo.admin.ch/internet/geoportal/' +
+                  'en/home.html">Pixelmap 1:1000000 / geo.admin.ch</a>',
+              crossOrigin: 'anonymous',
+              params: {
+                'LAYERS': 'ch.swisstopo.pixelkarte-farbe-pk1000.noscale',
+                'FORMAT': 'image/jpeg'
+              },
+              url: 'https://wms.geo.admin.ch/'
+            })
+          }),
+          new ImageLayer({
+            source: new ImageWMS({
+              attributions: '© <a href="http://www.geo.admin.ch/internet/geoportal/' +
+                  'en/home.html">National parks / geo.admin.ch</a>',
+              crossOrigin: 'anonymous',
+              params: {'LAYERS': 'ch.bafu.schutzgebiete-paerke_nationaler_bedeutung'},
+              serverType: 'mapserver',
+              url: 'https://wms.geo.admin.ch/'
+            })
+          })
+        ];
+        
+        // A minimal projection object is configured with only the SRS code and the map
+        // units. No client-side coordinate transforms are possible with such a
+        // projection object. Requesting tiles only needs the code together with a
+        // tile grid of Cartesian coordinates; it does not matter how those
+        // coordinates relate to latitude or longitude.
+        var projection = new Projection({
+          code: 'EPSG:21781',
+          units: 'm'
+        });
+        
+        var map = new Map({
+          layers: layers,
+          target: 'map',
+          view: new View({
+            center: [660000, 190000],
+            projection: projection,
+            zoom: 9
+          })
+        });</script>
+  </body>
+</html>
