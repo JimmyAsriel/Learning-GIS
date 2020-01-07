@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Regular Shapes</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script >import 'ol/ol.css';
+        import Feature from 'ol/Feature';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import Point from 'ol/geom/Point';
+        import VectorLayer from 'ol/layer/Vector';
+        import VectorSource from 'ol/source/Vector';
+        import {Fill, RegularShape, Stroke, Style} from 'ol/style';
+        
+        
+        var stroke = new Stroke({color: 'black', width: 2});
+        var fill = new Fill({color: 'red'});
+        
+        var styles = {
+          'square': new Style({
+            image: new RegularShape({
+              fill: fill,
+              stroke: stroke,
+              points: 4,
+              radius: 10,
+              angle: Math.PI / 4
+            })
+          }),
+          'triangle': new Style({
+            image: new RegularShape({
+              fill: fill,
+              stroke: stroke,
+              points: 3,
+              radius: 10,
+              rotation: Math.PI / 4,
+              angle: 0
+            })
+          }),
+          'star': new Style({
+            image: new RegularShape({
+              fill: fill,
+              stroke: stroke,
+              points: 5,
+              radius: 10,
+              radius2: 4,
+              angle: 0
+            })
+          }),
+          'cross': new Style({
+            image: new RegularShape({
+              fill: fill,
+              stroke: stroke,
+              points: 4,
+              radius: 10,
+              radius2: 0,
+              angle: 0
+            })
+          }),
+          'x': new Style({
+            image: new RegularShape({
+              fill: fill,
+              stroke: stroke,
+              points: 4,
+              radius: 10,
+              radius2: 0,
+              angle: Math.PI / 4
+            })
+          })
+        };
+        
+        
+        var styleKeys = ['x', 'cross', 'star', 'triangle', 'square'];
+        var count = 250;
+        var features = new Array(count);
+        var e = 4500000;
+        for (var i = 0; i < count; ++i) {
+          var coordinates = [2 * e * Math.random() - e, 2 * e * Math.random() - e];
+          features[i] = new Feature(new Point(coordinates));
+          features[i].setStyle(styles[styleKeys[Math.floor(Math.random() * 5)]]);
+        }
+        
+        var source = new VectorSource({
+          features: features
+        });
+        
+        var vectorLayer = new VectorLayer({
+          source: source
+        });
+        
+        var map = new Map({
+          layers: [
+            vectorLayer
+          ],
+          target: 'map',
+          view: new View({
+            center: [0, 0],
+            zoom: 2
+          })
+        });</script>
+  </body>
+</html>

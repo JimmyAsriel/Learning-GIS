@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WKT</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script  >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import WKT from 'ol/format/WKT';
+        import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer';
+        import {OSM, Vector as VectorSource} from 'ol/source';
+        
+        var raster = new TileLayer({
+          source: new OSM()
+        });
+        
+        var wkt = 'POLYGON((10.689 -25.092, 34.595 ' +
+            '-20.170, 38.814 -35.639, 13.502 ' +
+            '-39.155, 10.689 -25.092))';
+        
+        var format = new WKT();
+        
+        var feature = format.readFeature(wkt, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857'
+        });
+        
+        var vector = new VectorLayer({
+          source: new VectorSource({
+            features: [feature]
+          })
+        });
+        
+        var map = new Map({
+          layers: [raster, vector],
+          target: 'map',
+          view: new View({
+            center: [2952104.0199, -3277504.823],
+            zoom: 4
+          })
+        });</script>
+  </body>
+</html>

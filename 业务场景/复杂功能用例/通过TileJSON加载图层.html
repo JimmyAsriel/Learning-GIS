@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>TileJSON</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import TileLayer from 'ol/layer/Tile';
+        import TileJSON from 'ol/source/TileJSON';
+        
+        
+        var map = new Map({
+          layers: [
+            new TileLayer({
+              source: new TileJSON({
+                url: 'https://a.tiles.mapbox.com/v3/aj.1x1-degrees.json',
+                crossOrigin: 'anonymous'
+              })
+            })
+          ],
+          target: 'map',
+          view: new View({
+            center: [0, 0],
+            zoom: 2
+          })
+        });</script>
+  </body>
+</html>

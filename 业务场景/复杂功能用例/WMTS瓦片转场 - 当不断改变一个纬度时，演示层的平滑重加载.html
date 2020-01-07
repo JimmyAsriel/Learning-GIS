@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WMTS Tile Transitions</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <style>
+      .map {
+        width: 100%;
+        height:400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <label>
+      Sea-level
+      <input id="slider" type="range" value="10" max="100" min="-1">
+    </label>
+    <span id="theinfo"></span>
+    <script >import 'ol/ol.css';
+        import Map from 'ol/Map';
+        import View from 'ol/View';
+        import {getWidth, getTopLeft} from 'ol/extent';
+        import TileLayer from 'ol/layer/Tile';
+        import {get as getProjection} from 'ol/proj';
+        import OSM from 'ol/source/OSM';
+        import WMTS from 'ol/source/WMTS';
+        import WMTSTileGrid from 'ol/tilegrid/WMTS';
+        
+        
+        // create the WMTS tile grid in the google projection
+        var projection = getProjection('EPSG:3857');
+        var tileSizePixels = 256;
+        var tileSizeMtrs = getWidth(projection.getExtent()) / tileSizePixels;
+        var matrixIds = [];
+        var resolutions = [];
+        for (var i = 0; i <= 14; i++) {
+          matrixIds[i] = i;
+          resolutions[i] = tileSizeMtrs / Math.pow(2, i);
+        }
+        var tileGrid = new WMTSTileGrid({
+          origin: getTopLeft(projection.getExtent()),
+          resolutions: resolutions,
+          matrixIds: matrixIds
+        });
+        
+        var scalgoToken = 'CC5BF28A7D96B320C7DFBFD1236B5BEB';
+        
+        var wmtsSource = new WMTS({
+          url: 'http://ts2.scalgo.com/olpatch/wmts?token=' + scalgoToken,
+          layer: 'SRTM_4_1:SRTM_4_1_flooded_sealevels',
+          format: 'image/png',
+          matrixSet: 'EPSG:3857',
+          attributions: [
+            '<a href="http://scalgo.com">SCALGO</a>',
+            '<a href="https://cgiarcsi.community/data/' +
+                'srtm-90m-digital-elevation-database-v4-1">CGIAR-CSI SRTM</a>'
+          ],
+          tileGrid: tileGrid,
+          style: 'default',
+          dimensions: {
+            'threshold': 100
+          }
+        });
+        
+        var map = new Map({
+          target: 'map',
+          view: new View({
+            projection: projection,
+            center: [-9871995, 3566245],
+            zoom: 6
+          }),
+          layers: [
+            new TileLayer({
+              source: new OSM()
+            }),
+            new TileLayer({
+              opacity: 0.5,
+              source: wmtsSource
+            })
+          ]
+        });
+        
+        var updateSourceDimension = function(source, sliderVal) {
+          source.updateDimensions({'threshold': sliderVal});
+          document.getElementById('theinfo').innerHTML = sliderVal + ' meters';
+        };
+        
+        updateSourceDimension(wmtsSource, 10);
+        
+        document.getElementById('slider').addEventListener('input', function() {
+          updateSourceDimension(wmtsSource, this.value);
+        });</script>
+  </body>
+</html>
