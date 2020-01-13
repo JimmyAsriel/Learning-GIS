@@ -1,94 +1,92 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Custom Controls</title>
-<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
-<!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
-<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
-<script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
-<style>
-.rotate-north {
-top: 65px;
-left: .5em;
-}
-.ol-touch .rotate-north {
-top: 80px;
-}
-</style>
+    <title>Custom Controls</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script
+        src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <style>
+        .rotate-north {
+            top: 65px;
+            left: .5em;
+        }
+        .ol-touch .rotate-north {
+            top: 80px;
+        }
+    </style>
 </head>
+
 <body>
-<div id="map" class="map"></div>
-<script>
-/**
-* Define a namespace for the application.
-*/
-window.app = {};
-var app = window.app;
+    <div id="map" class="map"></div>
 
+    <script>
+        /**
+        * Define a namespace for the application.
+        */
+        window.app = {};
+        var app = window.app;
 
-//
-// Define rotate to north control.
-//
-
-
-/**
-* @constructor
-* @extends {ol.control.Control}
-* @param {Object=} opt_options Control options.
-*/
-app.RotateNorthControl = function(opt_options) {
-
-var options = opt_options || {};
-
-var button = document.createElement('button');
-button.innerHTML = 'N';
-
-var this_ = this;
-var handleRotateNorth = function() {
-this_.getMap().getView().setRotation(0);
-};
-
-button.addEventListener('click', handleRotateNorth, false);
-button.addEventListener('touchstart', handleRotateNorth, false);
-
-var element = document.createElement('div');
-element.className = 'rotate-north ol-unselectable ol-control';
-element.appendChild(button);
-
-ol.control.Control.call(this, {
-element: element,
-target: options.target
-});
-
-};
-ol.inherits(app.RotateNorthControl, ol.control.Control);
-
-
-//
-// Create map, giving it a rotate to north control.
-//
-
-
-var map = new ol.Map({
-controls: ol.control.defaults({
-attributionOptions: {
-collapsible: false
-}
-}).extend([
-new app.RotateNorthControl()
-]),
-layers: [
-new ol.layer.Tile({
-source: new ol.source.OSM()
-})
-],
-target: 'map',
-view: new ol.View({
-center: [0, 0],
-zoom: 3,
-rotation: 1
-})
-});
-</script>
+        //
+        // Define rotate to north control.
+        //
+        /**
+        * @constructor
+        * @extends {ol.control.Control}
+        * @param {Object=} opt_options Control options.
+        */
+        app.RotateNorthControl = function (opt_options) {
+            //初始化，巧妙的方法
+            var options = opt_options || {};
+            var button = document.createElement('button');
+            button.innerHTML = 'N';
+            //保存当前环境变量
+            var this_ = this;
+            var handleRotateNorth = function () {
+                this_.getMap().getView().setRotation(0);
+            };
+            button.addEventListener('click', handleRotateNorth, false);
+            button.addEventListener('touchstart', handleRotateNorth, false);
+            var element = document.createElement('div');
+            element.className = 'rotate-north ol-unselectable ol-control';
+            element.appendChild(button);
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+        };
+        ol.inherits(app.RotateNorthControl, ol.control.Control);
+        //
+        // Create map, giving it a rotate to north control.
+        //
+        var map = new ol.Map({
+            //默认情况下，地图中包含的控件集
+            //除非另行配置，否则它将返回一个包含以下每个控件实例的集合。
+            controls: ol.control.defaults({
+                //
+                attributionOptions: {
+                    //
+                    collapsible: false
+                }
+                //Modify an extent to include another extent.
+            }).extend([
+                //
+                new app.RotateNorthControl()
+            ]),
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            target: 'map',
+            view: new ol.View({
+                center: [0, 0],
+                zoom: 3,
+                rotation: 1
+            })
+        });
+    </script>
 </body>
 </html>
