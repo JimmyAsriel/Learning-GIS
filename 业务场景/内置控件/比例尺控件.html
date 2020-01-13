@@ -35,8 +35,11 @@
                     center: [0, 0],
                     zoom:2
                 }),
+                
             });
             //将比例尺控件加入到map中
+            //！！这个语句在无node.js的环境中会报错
+            //在一些环境下要在ol.map里添加controls: ol.control.defaults().extend([scaleLineControl])
             map.addControl(scaleLineControl);
         };
     </script>

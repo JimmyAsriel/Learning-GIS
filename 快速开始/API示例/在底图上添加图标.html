@@ -15,31 +15,26 @@
 <!-- <button id="zoom-out">Zoom out</button>
 <button id="zoom-in">Zoom in</button> -->
 <script>
-    //关键步骤
-        function createStyle(src/* , img */) {
-        return new ol.style.Style({
-          image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-            anchor: [0.5, 0.96],
-            crossOrigin: 'anonymous',
-            src: src,
-            /* img: img,//图像格式
-            imgSize: img ? [img.width, img.height] : undefined */
-          }))
-        });
-      }
-      var iconFeature = new ol.Feature(new ol.geom.Point([0, 0]));
-      iconFeature.set('style', createStyle('/pi.gif'/* , undefined */));
-        
+    
+      var iconFeature = new ol.Feature({//
+        type: new ol.style.Style({//图片的样式
+          image: new ol.style.Icon({
+            anchor: [0.5, 1],
+            src: 'https://openlayers.org/en/v4.6.5/examples/data/icon.png'
+          })
+        }),
+        geometry: new ol.geom.Point([0,0])//图标所在的位置
+      });
         
 var map = new ol.Map({
     layers: [//层。如果没有定义，将呈现没有图层的映射。
     new ol.layer.Tile({//对于提供预渲染、平铺图像的网格层源，这些网格是按特定分辨率的缩放级别组织的。
     source: new ol.source.OSM(),//OpenStreetMap平铺服务器的层源。
     }),
-    //关键步骤
+    //关键步骤，创建图层加入图标
     new ol.layer.Vector({
             style: function(feature) {
-              return feature.get('style');
+              return feature.get('type');//引入图标样式
             },
             source: new ol.source.Vector({features: [iconFeature]})
           })
