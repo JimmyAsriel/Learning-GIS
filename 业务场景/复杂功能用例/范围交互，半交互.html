@@ -1,53 +1,57 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Extent Interaction</title>
-<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
-<!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
-<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
-<script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <title>Extent Interaction</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script
+        src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
 </head>
+
 <body>
-<div id="map" class="map"></div>
-<script>
-var vectorSource = new ol.source.Vector({
-url: 'https://openlayers.org/en/v4.6.5/examples/data/geojson/countries.geojson',
-format: new ol.format.GeoJSON()
-});
+    <div id="map" class="map"></div>
+    <script>
+        var vectorSource = new ol.source.Vector({
+            url: 'https://openlayers.org/en/v4.6.5/examples/data/geojson/countries.geojson',
+            format: new ol.format.GeoJSON()
+        });
 
-var map = new ol.Map({
-layers: [
-new ol.layer.Tile({
-source: new ol.source.OSM()
-}),
-new ol.layer.Vector({
-source: vectorSource
-})
-],
-target: 'map',
-view: new ol.View({
-center: [0, 0],
-zoom: 2
-})
-});
+        var map = new ol.Map({
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                new ol.layer.Vector({
+                    source: vectorSource
+                })
+            ],
+            target: 'map',
+            view: new ol.View({
+                center: [0, 0],
+                zoom: 2
+            })
+        });
 
-var extent = new ol.interaction.Extent({
-condition: ol.events.condition.platformModifierKeyOnly
-});
-map.addInteraction(extent);
-extent.setActive(false);
+        var extent = new ol.interaction.Extent({
+            condition: ol.events.condition.platformModifierKeyOnly
+        });
+        map.addInterWaction(exWtent);
+        extent.setActive(false);
 
-//Enable interaction by holding shift
-this.addEventListener('keydown', function(event) {
-if (event.keyCode == 16) {
-extent.setActive(true);
-}
-});
-this.addEventListener('keyup', function(event) {
-if (event.keyCode == 16) {
-extent.setActive(false);
-}
-});
-</script>
+        //Enable interaction by holding shift
+        this.addEventListener('keydown', function (event) {
+            if (event.keyCode == 16) {
+                extent.setActive(true);
+            }
+        });
+        this.addEventListener('keyup', function (event) {
+            if (event.keyCode == 16) {
+                extent.setActive(false);
+            }
+        });
+    </script>
 </body>
+
 </html>
