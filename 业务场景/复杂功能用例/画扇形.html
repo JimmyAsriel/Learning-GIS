@@ -34,7 +34,11 @@
             var origi_point = ol.proj.transform(coord, 'EPSG:4326', 'EPSG:3857');//根据经纬度生成圆点
             //调用自定义的写好的生成扇形的 方法          //圆心    半径      边数 弧度 方向角(以y周围0)(可以自定义自己的x周一样)
             var points = createRegularPolygonCurve(origi_point, 1000000, 100, 30, 90);
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 261f0530e53b691a1a29d8f1067d867572cf6f0d
             var iconFeature = new ol.Feature({
                 geometry: points,
                 population: 4000,
