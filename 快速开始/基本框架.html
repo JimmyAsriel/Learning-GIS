@@ -20,34 +20,28 @@
 
 <body>
     <h2>My Map</h2>
-    
-    <!-- 创建控件标签 -->
+
     <div id="map" class="map"></div>
 
     <script type="text/javascript">
-        //接口类型 参数 功能
-        var map = new ol.Map({
-            //参数功能 选定指定的Div容器初始化为控件
-            target: 'map',
-            //图层
-            layers: [
-                //接口
-                //对象
-                //参数
-                new ol.layer.Tile({
-                    //接口
-                    //对象
-                    //参数
-                    source: new ol.source.OSM()
+        //
+        var BaseLayerTile = new ol.layer.Vector({
+            source: new ol.source.Cluster({
+                distance: 80,   // 聚类阈值，当两点间距离小于20，便聚类为一个点
+                source: new ol.source.Vector({
+                    format: new ol.format.GeoJSON(),
+                    url: 'https://geo.datav.aliyun.com/areas/bound/100000.json'
                 })
-            ],
-            //接口
-            //对象
-            //参数
-            view: new ol.View({
-                center: ol.proj.fromLonLat([37.41, 8.82]),
-                zoom: 4
             })
+        });
+
+        var map = new ol.Map({
+            target: 'map',
+            layers: [
+                BaseLayerTile,
+
+            ],
+            view: view
         });
     </script>
 </body>

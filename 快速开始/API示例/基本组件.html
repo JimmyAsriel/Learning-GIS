@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css"
+        type="text/css">
+    <style>
+        /* 
+            在OpenLayers中，控制May控件的显示大小
+            用CSS来控制承载控件的Div大小
+        */
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+    <title>OpenLayers example</title>
+</head>
+
+<body>
+    <h2>My Map</h2>
+
+    <!-- 创建控件标签 -->
+    <div id="map" class="map"></div>
+
+    <script type="text/javascript">
+        //错误的地理坐标，该坐标虽然可以正常识别
+        //但不指定投影就无法区分具体位置，但是利用这个坐标和1放大倍数可以方便的观察
+        //世界地图
+        var place = [0, 0];
+        //坐标to投影，默认墨卡托投影EPSG:3857
+        //需要注意的是OSM默认投影坐标是
+        var moscow = ol.proj.fromLonLat([37.6178, 55.7517], 'EPSG:3857');
+
+        //GeoJSON类型的数据保存了点线面的类型
+        //并且包含了对投影等描述
+        //OL接口可以方便的直接解析
+        var geojsonObject = {
+            'type': 'FeatureCollection',
+            'crs': {
+                'type': 'name',
+                'properties': {
+                    'name': 'EPSG:3857'
+                }
+            },
+            'features': [{
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [0, 0]
+                }
+            }, {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'LineString',
+                    'coordinates': [[4e6, -2e6], [8e6, 2e6]]
+                }
+            }, {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'LineString',
+                    'coordinates': [[4e6, 2e6], [8e6, -2e6]]
+                }
+            }, {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [[[-5e6, -1e6], [-4e6, 1e6], [-3e6, -1e6]]]
+                }
+            }, {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'MultiLineString',
+                    'coordinates': [
+                        [[-1e6, -7.5e5], [-1e6, 7.5e5]],
+                        [[1e6, -7.5e5], [1e6, 7.5e5]],
+                        [[-7.5e5, -1e6], [7.5e5, -1e6]],
+                        [[-7.5e5, 1e6], [7.5e5, 1e6]]
+                    ]
+                }
+            }, {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'MultiPolygon',
+                    'coordinates': [
+                        [[[-5e6, 6e6], [-5e6, 8e6], [-3e6, 8e6], [-3e6, 6e6]]],
+                        [[[-2e6, 6e6], [-2e6, 8e6], [0, 8e6], [0, 6e6]]],
+                        [[[1e6, 6e6], [1e6, 8e6], [3e6, 8e6], [3e6, 6e6]]]
+                    ]
+                }
+            }, {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'GeometryCollection',
+                    'geometries': [{
+                        'type': 'LineString',
+                        'coordinates': [[-5e6, -5e6], [0, -5e6]]
+                    }, {
+                        'type': 'Point',
+                        'coordinates': [4e6, -5e6]
+                    }, {
+                        'type': 'Polygon',
+                        'coordinates': [[[1e6, -6e6], [2e6, -4e6], [3e6, -6e6]]]
+                    }]
+                }
+            }]
+        };
+
+
+
+        /* 
+            渲染的流程：数据(多类型) --> 向量化(类似Tile数据) --> Map渲染
+         */
+
+        //Vector是Scource的实现
+        var vectorSource = new ol.source.Vector({
+            features: (new ol.format.GeoJSON()).readFeatures(geojsonObject)
+        });
+
+        //动态的添加坐标添加到Source上
+        vectorSource.addFeature(new ol.Feature(new ol.geom.Circle([5e6, 7e6], 1e6)));
+
+        //Tile是对Source的封装
+        var BaseLayerTile = new ol.layer.Tile({
+            source: new ol.source.OSM()
+        });
+        
+        //注意OSM提供的数据是EPSG:3857投影
+        console.log(new ol.source.OSM().getProjection())
+        var SecondLayerTile = new ol.layer.Vector({
+            source: vectorSource,
+            //想要修饰线段的颜色即Stroke
+            style:new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'blue',
+                size: 1
+            })
+        })
+
+            
+        });
+        var view = new ol.View({
+            center: moscow,
+            //Zoom放大倍数影响地图的最大可视大小
+            zoom: 5
+        })
+
+
+        var map = new ol.Map({
+            target: 'map',
+            layers: [
+                BaseLayerTile,
+                SecondLayerTile
+            ],
+            view: view
+        });
+    </script>
+</body>
+
+</html>
