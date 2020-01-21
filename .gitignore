@@ -1,1 +1,5 @@
+# NPM包管理
 node_modules/
+# Parcel生成结果
+dist/
+.cache/

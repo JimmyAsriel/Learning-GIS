@@ -359,8 +359,6 @@
 
 //TestStart
           //
-
-
           var TestFeature = new ol.Feature({
             geometry: new ol.geom.Circle(lines_arr[0], 0.30)
           });
@@ -462,7 +460,6 @@
                 .setRotation(me._map_p_rotation(new_p, old_p));
 
 //TestStart
-
               me.all_obj.history.test_circle.setGeometry(new ol.geom.Circle(new_p, 0.30));
               //console.log(me.all_obj.history.test_circle.getProperties())
               
