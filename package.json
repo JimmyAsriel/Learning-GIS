@@ -5,6 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel index.html",
+    "build": "parcel build --public-url . index.html",
+    "example":"parcel ./业务场景/复杂功能用例/Image tile sources的加载事件，基于事件为地图加载添加一个底部进度条.html"
   },
   "repository": {
     "type": "git",
@@ -18,6 +21,8 @@
   "homepage": "https://github.com/CharlesKiki/Learning-GIS#readme",
   "dependencies": {
     "ol": "^6.1.1"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4"
   }
-  
 }
